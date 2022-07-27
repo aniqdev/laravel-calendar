@@ -1,0 +1,23 @@
+:root{
+    
+}
+
+@media (max-width: 767px){
+    .container, .container-sm{
+        max-width: 740px;
+    }
+}
+
+.errors-list{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 600px;
+    padding: 0 15px;
+    background: #fff;
+    z-index: 9999;
+}
+
+.errors-list .alert{
+    margin-top: 1rem;
+}
