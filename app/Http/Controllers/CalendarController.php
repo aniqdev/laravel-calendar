@@ -32,7 +32,7 @@ class CalendarController extends Controller
             $GoogleCalendarApi = new GoogleCalendarApi();
             $events = $GoogleCalendarApi->GetEventsList(session('calendar_id'));
         }
-        if (is_array($events['items'])) {
+        if (isset($events['items']) && is_array($events['items'])) {
             foreach ($events['items'] as $key => $event) {
                 Event::updateOrCreate([
                     'event_id' => $event['id']
@@ -248,7 +248,7 @@ class GoogleCalendarApi {
             $curlPost['start'] = array('dateTime' => $dateTime_start, 'timeZone' => $event_timezone); 
             $curlPost['end'] = array('dateTime' => $dateTime_end, 'timeZone' => $event_timezone); 
         }
-        
+
         $url = self::CALENDAR_EVENT . $calendar_id . '/events';
         $data = self::curlPostJson($url, $curlPost, session('google_access_token'));
  
@@ -300,7 +300,10 @@ class GoogleCalendarApi {
         $data = json_decode(curl_exec($ch), true); 
         $http_code = curl_getinfo($ch,CURLINFO_HTTP_CODE);        
          // dd($data);
-        if ($http_code != 200) { 
+        if ($http_code == 401) {
+            session()->forget('google_access_token');
+            return [];
+        }elseif ($http_code != 200) { 
             $error_msg = 'Failed'; 
             if (curl_errno($ch)) { 
                 $error_msg = curl_error($ch); 
@@ -313,6 +316,7 @@ class GoogleCalendarApi {
     public static function curlPostJson($url, $post_data, $token = false)
     {
         dump($post_data);
+        dump($token);
         $ch = curl_init();         
         curl_setopt($ch, CURLOPT_URL, $url);         
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);         
@@ -323,7 +327,10 @@ class GoogleCalendarApi {
         $data = json_decode(curl_exec($ch), true); 
         $http_code = curl_getinfo($ch,CURLINFO_HTTP_CODE);        
          dd($data);
-        if ($http_code != 200) { 
+        if ($http_code == 401) {
+            session()->forget('google_access_token');
+            return [];
+        }elseif ($http_code != 200) { 
             $error_msg = 'Failed'; 
             if (curl_errno($ch)) { 
                 $error_msg = curl_error($ch); 
