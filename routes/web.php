@@ -15,7 +15,7 @@ use App\Http\Controllers\CalendarController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/calendar');
 });
 
 Route::get('/calendar', [CalendarController::class, 'calendar']);
